@@ -1,10 +1,4 @@
-import {
-  Component,
-  Inject,
-  OnDestroy,
-  OnInit,
-  PLATFORM_ID,
-} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CalculatorService } from './services/calculator.service';
 import {
   fromEvent,
@@ -16,7 +10,6 @@ import {
   Timestamp,
   timestamp,
 } from 'rxjs';
-import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -29,10 +22,7 @@ export class AppComponent implements OnInit, OnDestroy {
   count = 0;
   private destroy$ = new Subject<void>();
 
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private calculator: CalculatorService
-  ) {}
+  constructor(private calculator: CalculatorService) {}
 
   get currentBPM(): number {
     return this.calculator.bpm;
@@ -49,12 +39,10 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      this.keys$().subscribe((interval) => {
-        this.count = interval;
-        this.calculator.calculateBpm(interval);
-      });
-    }
+    this.keys$().subscribe((interval) => {
+      this.count = interval;
+      this.calculator.calculateBpm(interval);
+    });
   }
 
   ngOnDestroy(): void {
