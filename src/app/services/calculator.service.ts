@@ -4,11 +4,27 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class CalculatorService {
-  constructor() {
-    // BPM(Beats Per Minute) 계산을 위한 기본 공식은:
-    // BPM = (60 seconds / time interval between beats in seconds)
-    // 예를 들어:
-    // 두 번의 탭 사이가 0.5초라면: 60 / 0.5 = 120 BPM
-    //두 번의 탭 사이가 1초라면: 60 / 1 = 60 BPM
+  private intervals: number[] = [];
+  private accuracy: number = 20; // 평균값 배열의 길이
+  bpm = 0;
+  averageInterval = 0;
+
+  constructor() {}
+
+  calculateBpm(interval: number) {
+    this.calculateAverageInterval(interval);
+    this.bpm = 60000 / this.averageInterval;
+  }
+
+  private calculateAverageInterval(interval: number) {
+    this.intervals.push(interval);
+
+    if (this.intervals.length > this.accuracy) {
+      this.intervals = this.intervals.slice(1);
+    }
+
+    this.averageInterval = this.intervals.reduce((cur, acc) => {
+      return (cur + acc) / 2;
+    }, 0);
   }
 }
