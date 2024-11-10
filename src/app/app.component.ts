@@ -34,6 +34,10 @@ export class AppComponent implements OnInit, OnDestroy {
     private calculator: CalculatorService
   ) {}
 
+  get currentBPM(): number {
+    return this.calculator.bpm;
+  }
+
   keys$(): Observable<number> {
     return fromEvent<KeyboardEvent>(document, 'keydown').pipe(
       takeUntil(this.destroy$),
@@ -46,7 +50,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
-      this.keys$().subscribe((interval) => (this.count = interval));
+      this.keys$().subscribe((interval) => {
+        this.count = interval;
+        this.calculator.calculateBpm(interval);
+      });
     }
   }
 

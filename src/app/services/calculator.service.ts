@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -6,17 +7,17 @@ import { Injectable } from '@angular/core';
 export class CalculatorService {
   private intervals: number[] = [];
   private accuracy: number = 20; // 평균값 배열의 길이
-  bpm = 0;
+  private bpmSubject = new BehaviorSubject<number>(0);
+  bpm$ = this.bpmSubject.asObservable();
   averageInterval = 0;
 
   constructor() {}
 
-  calculateBpm(interval: number) {
-    this.calculateAverageInterval(interval);
-    this.bpm = 60000 / this.averageInterval;
+  get bpm(): number {
+    return this.bpmSubject.value;
   }
 
-  private calculateAverageInterval(interval: number) {
+  calculateBpm(interval: number) {
     this.intervals.push(interval);
 
     if (this.intervals.length > this.accuracy) {
@@ -26,5 +27,9 @@ export class CalculatorService {
     this.averageInterval = this.intervals.reduce((cur, acc) => {
       return (cur + acc) / 2;
     }, 0);
+
+    const newBpm = Math.round(60000 / this.averageInterval);
+
+    this.bpmSubject.next(newBpm);
   }
 }
